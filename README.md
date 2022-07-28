@@ -1,8 +1,8 @@
-#CPP_sfml
+# CPP_sfml
 
 using sfml library for basic animation practices and comupter graphics
 
-#Compilation instructions
+# Compilation instructions
 
 compiling
 // generating object file
