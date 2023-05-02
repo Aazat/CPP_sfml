@@ -44,19 +44,6 @@ while delta > theta:
             v = V[(i,j)]
             v_new = 0
             for a in range(4):
-                # if a == 0:  # up
-                #     i_new, j_new = max(i-1, 1), j
-                # elif a == 1:  # down
-                #     i_new, j_new = min(i+1, nrow), j
-                # elif a == 2:  # left
-                #     i_new, j_new = i, max(j-1, 1)
-                # elif a == 3:  # right
-                #     i_new, j_new = i, min(j+1, ncol)
-                # r = -1 if i == i_new and j == j_new else 0  # penalty for moving off grid
-                # if (i,j) == (1,2):
-                #     r, i_new, j_new = 10, 5, 1
-                # elif (i,j) == (1,4):
-                #     r, i_new, j_new = 5, 3, 4
                 i_new, j_new, r = step(a, i, j)
                 v_new += policy[i-1,j-1,a] * (r + gamma * V[(i_new,j_new)])
             V[(i,j)] = v_new
