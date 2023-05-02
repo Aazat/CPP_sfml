@@ -128,9 +128,10 @@ gamma = 0.9
 threshold = 1e-4
 # Simulate the gridworld and visualize it
 for i in range(50):
-    action = np.random.choice(actions)
-    print(ACTIONS[action])
+    action = np.random.choice(ACTIONS)
+    print(action)
     state, reward = gridworld.step(action)
+    print(state, reward)
     gridworld.draw()            
     pygame.time.delay(500)
 
