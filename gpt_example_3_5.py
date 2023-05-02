@@ -49,40 +49,7 @@ class Gridworld:
             reward = -1
 
         return self.agent_pos, reward
-    
-    def step_new(self, action:int):
-
-        if tuple(self.agent_pos) in SPECIAL_STATES:
-            reward , self.agent_pos = SPECIAL_STATES[tuple(self.agent_pos)]
-            return self.agent_pos, reward
         
-        if action == 0:  # up
-            if self.agent_pos[0] == 0:
-                reward = -1
-            else:
-                self.agent_pos[0] -= 1
-                reward = 0
-        elif action == 1:  # down
-            if self.agent_pos[0] == GRID_HEIGHT - 1:
-                reward = -1
-            else:
-                self.agent_pos[0] += 1
-                reward = 0
-        elif action == 2:  # left
-            if self.agent_pos[1] == 0:
-                reward = -1
-            else:
-                self.agent_pos[1] -= 1
-                reward = 0
-        elif action == 3:  # right
-            if self.agent_pos[1] == GRID_WIDTH - 1:
-                reward = -1
-            else:
-                self.agent_pos[1] += 1
-                reward = 0
-        
-
-        return self.agent_pos, reward
 
     def draw(self):
         self.screen.fill(BLACK)
