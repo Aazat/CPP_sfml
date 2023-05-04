@@ -13,42 +13,42 @@ RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 
 # Define the special states and their rewards
-SPECIAL_STATES = {(0, 1): (10, [4,1]), (0, 3): (5,[2,3])}
+SPECIAL_STATES = {(0, 1): (10, (4,1)), (0, 3): (5, (2,3))}
 ACTIONS = ["up", "down", "left", "right"]
 actions = [0,1,2,3]
 class Gridworld:
     def __init__(self):
         self.grid = np.zeros((GRID_HEIGHT, GRID_WIDTH))
         self.agent_pos = [0, 0]
-        self.screen = pygame.display.set_mode((GRID_WIDTH*CELL_WIDTH, GRID_HEIGHT*CELL_HEIGHT))
+        # self.screen = pygame.display.set_mode((GRID_WIDTH*CELL_WIDTH, GRID_HEIGHT*CELL_HEIGHT))
 
     def reset(self):
         self.grid = np.zeros((GRID_HEIGHT, GRID_WIDTH))
         self.agent_pos = [0, 0]
 
-    def step(self, action:str):
+    def step(self, action:str, i:int, j:int):
         reward = 0        
 
-        if tuple(self.agent_pos) in SPECIAL_STATES:
-            reward , self.agent_pos = SPECIAL_STATES[tuple(self.agent_pos)]
-            return self.agent_pos, reward
+        if (i,j) in SPECIAL_STATES:
+            reward , (i,j) = SPECIAL_STATES[(i,j)]
+            return i,j, reward
         
-        state = self.agent_pos[:]
+        state = (i,j)
         # Move the agent according to the action
         if action == "up":
-            self.agent_pos[0] = max(self.agent_pos[0] - 1, 0)
+            i = max(i - 1, 0)
         elif action == "down":
-            self.agent_pos[0] = min(self.agent_pos[0] + 1, GRID_HEIGHT-1)
+            i = min(i + 1, GRID_HEIGHT-1)
         elif action == "left":
-            self.agent_pos[1] = max(self.agent_pos[1] - 1, 0)
+            j = max(j - 1, 0)
         elif action == "right":
-            self.agent_pos[1] = min(self.agent_pos[1] + 1, GRID_WIDTH-1)
+            j = min(j + 1, GRID_WIDTH-1)
 
 
-        if state == self.agent_pos:
+        if state == (i,j):
             reward = -1
 
-        return self.agent_pos, reward
+        return i,j, reward
         
 
     def draw(self):
@@ -79,10 +79,11 @@ class Gridworld:
                     v = self.grid[i,j] 
                     value = 0
                     for action in ACTIONS:
-                        next_state, reward = self.step(action)
-                        # print(next_state, reward)
-                        value += 0.25 * (reward + gamma*self.grid[next_state[0], next_state[1]])
+                        next_state_x, next_state_y, reward = self.step(action,i,j)
+                        
+                        value += 0.25 * (reward + gamma*self.grid[next_state_x, next_state_y])
                     self.grid[i,j] = value
+                    
                     delta = max(delta, abs(v - self.grid[i, j]))
             if delta < threshold:
                 break
@@ -94,15 +95,15 @@ gridworld = Gridworld()
 gamma = 0.9
 threshold = 1e-4
 # Simulate the gridworld and visualize it
-for i in range(50):
-    action = np.random.choice(ACTIONS)
-    print(action)
-    state, reward = gridworld.step(action)
-    print(state, reward)
-    gridworld.draw()            
-    pygame.time.delay(500)
+# for i in range(50):
+#     action = np.random.choice(ACTIONS)
+#     print(action)
+#     state, reward = gridworld.step(action)
+#     print(state, reward)
+#     gridworld.draw()            
+#     pygame.time.delay(500)
 
-# gridworld.policy_evaluation(gamma, threshold)
-print(gridworld.grid)
+gridworld.policy_evaluation(gamma, threshold)
+print(np.round(gridworld.grid,2))
 
 # gridworld.close()
