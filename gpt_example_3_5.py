@@ -12,8 +12,9 @@ class Gridworld:
         self.actions = [0,1,2,3]
         self.SPECIAL_STATES = {(0, 1): (10, (4,1)), (0, 3): (5, (2,3))}
         self.agent_pos = [0, 0]
-        # self.screen = pygame.display.set_mode((self.GRID_WIDTH*self.CELL_WIDTH, self.GRID_HEIGHT*self.CELL_HEIGHT))
+        self.policy = np.ones((self.GRID_HEIGHT, self.GRID_WIDTH, len(self.ACTIONS))) / 4
 
+        # self.screen = pygame.display.set_mode((self.GRID_WIDTH*self.CELL_WIDTH, self.GRID_HEIGHT*self.CELL_HEIGHT))
         self.CELL_WIDTH = 100
         self.CELL_HEIGHT = 100
         self.BLACK = (0, 0, 0)
@@ -78,10 +79,11 @@ class Gridworld:
                 for j in range(self.GRID_WIDTH):
                     v = self.grid[i,j] 
                     value = 0
-                    for action in self.ACTIONS:
+                    for int_action, action in enumerate(self.ACTIONS):
+                        self.agent_pos = [i,j]
                         next_state_x, next_state_y, reward = self.step(action,i,j)
                         
-                        value += 0.25 * (reward + gamma*self.grid[next_state_x, next_state_y])
+                        value += self.policy[i,j,int_action] * (reward + gamma*self.grid[next_state_x, next_state_y])
                     self.grid[i,j] = value
                     
                     delta = max(delta, abs(v - self.grid[i, j]))
