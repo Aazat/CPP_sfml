@@ -1,3 +1,6 @@
+import os
+# os.environ['SDL_AUDIODRIVER'] = 'dummy'
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 import pygame
 import numpy as np
 
@@ -14,7 +17,7 @@ class Gridworld:
         self.agent_pos = [0, 0]
         self.policy = np.ones((self.GRID_HEIGHT, self.GRID_WIDTH, len(self.ACTIONS))) / 4
 
-        # self.screen = pygame.display.set_mode((self.GRID_WIDTH*self.CELL_WIDTH, self.GRID_HEIGHT*self.CELL_HEIGHT))
+        
         self.CELL_WIDTH = 100
         self.CELL_HEIGHT = 100
         self.BLACK = (0, 0, 0)
@@ -22,6 +25,7 @@ class Gridworld:
         self.GREEN = (0, 255, 0)
         self.RED = (255, 0, 0)
         self.BLUE = (0, 0, 255)
+        # self.screen = pygame.display.set_mode((self.GRID_WIDTH*self.CELL_WIDTH, self.GRID_HEIGHT*self.CELL_HEIGHT))
 
     def reset(self):
         self.grid = np.zeros((self.GRID_HEIGHT, self.GRID_WIDTH))
@@ -80,7 +84,7 @@ class Gridworld:
                     v = self.grid[i,j] 
                     value = 0
                     for int_action, action in enumerate(self.ACTIONS):
-                        self.agent_pos = [i,j]
+                        
                         next_state_x, next_state_y, reward = self.step(action,i,j)
                         
                         value += self.policy[i,j,int_action] * (reward + gamma*self.grid[next_state_x, next_state_y])
@@ -94,18 +98,35 @@ class Gridworld:
         pygame.quit()
 
 gridworld = Gridworld()
-gamma = 0.9
-threshold = 1e-4
-# Simulate the gridworld and visualize it
-# for i in range(50):
-#     action = np.random.choice(self.ACTIONS)
-#     print(action)
-#     state, reward = gridworld.step(action)
-#     print(state, reward)
-#     gridworld.draw()            
-#     pygame.time.delay(500)
+policy = np.ones((gridworld.GRID_HEIGHT, gridworld.GRID_WIDTH, 4)) / 4
+policy[4] = [1,0,0,0]
+policy[:,4] = [0,0,1,0]
+policy[:,0] = [0,0,0,1]
+policy[0] = [0,1,0,0]
+gridworld.policy = policy
 
-gridworld.policy_evaluation(gamma, threshold)
-print(np.round(gridworld.grid,2))
+# Simulate the gridworld and visualize it
+n_episodes = 100
+n_steps = 500
+
+rewards = []
+for i in range(n_episodes):
+    reward = 0
+    for i in range(n_steps):
+        action = np.random.choice(gridworld.ACTIONS, p=gridworld.policy[gridworld.agent_pos[0], gridworld.agent_pos[1]])
+
+        # print(action)
+        gridworld.agent_pos[0],gridworld.agent_pos[1], r = gridworld.step(action, gridworld.agent_pos[0], gridworld.agent_pos[1])
+
+        reward += r    
+    # print(gridworld.agent_pos, r)
+    # gridworld.draw()            
+    # pygame.time.delay(500)
+    rewards.append(reward)
+print(f"Average reward over {n_episodes} episodes of {n_steps} steps : {np.mean(rewards)}")
+# gamma = 0.9
+# threshold = 1e-4
+# gridworld.policy_evaluation(gamma, threshold)
+# print(np.round(gridworld.grid,2))
 
 # gridworld.close()
